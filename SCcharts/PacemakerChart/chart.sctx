@@ -1,0 +1,20 @@
+scchart Pacemaker {
+  input bool AS, VS
+  output bool AP, VP
+  
+  initial state WaitASandVS {
+    region HandleAS {
+      initial state waitAS
+      if AS go to doneAS
+      
+      final state doneAS
+    }
+    
+    region HandleVS {
+      initial state waitVS
+      if VS go to doneVS
+      
+      final state doneVS
+    }
+  }
+}
