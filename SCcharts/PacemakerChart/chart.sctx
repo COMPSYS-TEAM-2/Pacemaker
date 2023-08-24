@@ -2,51 +2,51 @@ scchart Pacemaker {
   input signal AS, VS
   output signal AP, VP
   
-    region HandleAS {
-      
+    region Atrium {
       clock PVARP, AEI
-      region AS0 {
-        initial state noAS
-        if !AEI & !AS go to noAS
-                
-        if AEI do AP go to AS
-        
-        if AS go to AS
-        
-        final state AS
-      }
       
-     region AS1 {
-       initial state noPVARP
-       
-       if !PVARP go to noPVARP
-       
-       if PVARP go to PVARP
-       
-       final state PVARP
-     }      
+      initial state WaitAS
+        if AEI do AP go to WaitVS
+        
+        if AS & PVARP go to WaitVS
+        
+        if !AEI & !(AS & PVARP) go to WaitAS
+        
+        final state WaitVS
     }
-    region HandleVS {
-      clock AVI, VRP
-      region VS0 {
-        initial state noVS
-        if !AVI & !VS go to noVS
+    region Ventricle {
+      clock VRP, LRI, AVI, URI
+      initial state WaitVS
+        if VS & VRP go to WaitAS
         
-        if AVI do VP go to VS
+        if LRI | (AVI & URI) do VP go to WaitAS
         
-        if AS go to VS
+        if !(VS & VRP) & !(LRI | (AVI & URI)) go to WaitVS
         
-        final state VS        
-      }
-      region VS1 {
-        initial state noVRP
-        
-        if !VRP go to noVRP
-        
-        if VRP go to VRPs
-        
-        final state VRPs
-      }
+        final state WaitAS
     }
-    
+//    
+//    region HandleVS {
+//      clock AVI, VRP
+//      region VS0 {
+//        initial state noVS
+//        if !AVI & !VS go to noVS
+//        
+//        if AVI do VP go to VS
+//        
+//        if AS go to VS
+//        
+//        final state VS        
+//      }
+//      region VS1 {
+//        initial state noVRP
+//        
+//        if !VRP go to noVRP
+//        
+//        if VRP go to VRPs
+//        
+//        final state VRPs
+//      }
+//    }
+//    
 }
