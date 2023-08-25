@@ -1,5 +1,5 @@
 #resource "timing.h"
-#hostcode-c "#include \"timing.h"
+#hostcode-c "#include \"timing.h\""
 
 scchart Pacemaker {
   input signal AS, VS
@@ -10,18 +10,19 @@ scchart Pacemaker {
       clock PVARP, AEI, VRP, LRI, AVI, URI
       
       initial state WaitAS
-      if AEI > `AVI_VALUE` do AP go to setupVS
+      if (AEI >= `AVI_VALUE`) do AP go to setupVS
       
-      if AS & PVARP < `PVARP_VALUE` go to setupVS
+      if (PVARP >= `PVARP_VALUE`) && AS go to setupVS
       
       connector state setupVS
       // Reset timers
         do AVI = 0 go to WaitVS
+        
       state WaitVS
       
-        if VS & VRP go to setupAS
+        if (VRP >= `VRP_VALUE`) && VS go to setupAS
         
-        if LRI >= `LRI_VALUE` | (AVI > `AVI_VALUE` & URI > `URI_VALUE`) do VP go to setupAS
+        if (LRI >= `LRI_VALUE`) || ((AVI >= `AVI_VALUE`) && (URI >= `URI_VALUE`)) do VP go to setupAS
       
         connector state setupAS
         
