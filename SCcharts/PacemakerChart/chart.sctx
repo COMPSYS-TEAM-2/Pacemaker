@@ -20,9 +20,13 @@ scchart Pacemaker {
         
       state WaitVS
       
-        if (VRP >= `VRP_VALUE`) && VS go to setupAS
+        if VS go to setupAS
+      
+//        if (VRP >= `VRP_VALUE`) && VS go to setupAS
         
-        if (LRI >= `LRI_VALUE`) || ((AVI >= `AVI_VALUE`) && (URI >= `URI_VALUE`)) do VP go to setupAS
+//        if (AVI >= `AVI_VALUE`) do VP go to setupAS
+        
+//        if (URI >= `URI_VALUE`) do VP go to setupAS
       
         connector state setupAS
         
