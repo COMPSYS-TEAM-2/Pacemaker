@@ -57,7 +57,7 @@ def main():
 
     aveAtoV /= i
     aveVtoA /= i
-    aveAtoA /= i * 600
+    aveAtoA /= i * 10
     print("A to V = ", aveAtoV)
     print("V to A = ", aveVtoA)
     print("BPM = ", aveAtoA)
