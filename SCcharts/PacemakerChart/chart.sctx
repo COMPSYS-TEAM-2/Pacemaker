@@ -10,10 +10,9 @@ scchart Pacemaker {
       clock PVARP, AEI, VRP, LRI, AVI, URI
       
       initial state WaitAS
-        
-        if (AEI >= `AEI_VALUE`) do AP go to setupVS
-        
         if (PVARP >= `PVARP_VALUE`) && AS go to setupVS
+                
+        if (AEI >= `AEI_VALUE`) do AP go to setupVS
       
       connector state setupVS
         // Reset timers
@@ -21,12 +20,9 @@ scchart Pacemaker {
         
       state WaitVS
       
-//        if VS go to setupAS
-      
         if (VRP >= `VRP_VALUE`) && VS go to setupAS
-        // Swap URI, LRI
-        
-        if (!(LRI >= `LRI_VALUE`)) && ((AVI >= `AVI_VALUE`) && (URI >= `URI_VALUE`)) do VP go to setupAS
+
+        if (((URI >= `URI_VALUE`) && (AVI >= `AVI_VALUE`)) || (LRI >= `LRI_VALUE`)) do VP go to setupAS
       
         connector state setupAS
         

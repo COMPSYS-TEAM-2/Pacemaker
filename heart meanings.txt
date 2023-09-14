@@ -2,12 +2,4 @@ AV Autorythmic: Backup to SA, middle of heart. (60 bpm) Signals arrive at the sa
 SA Autorythmic: Natural pacemaker (100bpm) Defines timing of heart
 AV Conduction: Conduction from atria to venticle (or vise versa)
 
-Sample answers?
 
-How many pulses is too many?
-
-Why does the heart act different when we try to change it?
-
-
-LRI not working right
-URI might be mixed up
