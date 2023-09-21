@@ -24,7 +24,7 @@ scchart Pacemaker {
         
         if (URI >= `URI_VALUE` - 300) && (AVI >= `AVI_VALUE`) do VP go to setupAS
         
-        if (URI >= `URI_VALUE` - 300) && (LRI >= `LRI_VALUE`) do VP go to setupAS
+        if (URI >= `URI_VALUE` - 300) && (LRI >= `LRI_VALUE` + 100) do VP go to setupAS
 
         // if (((URI >= `URI_VALUE`) && (AVI >= `AVI_VALUE`)) || (LRI >= `LRI_VALUE`))  do VP go to setupAS
       
