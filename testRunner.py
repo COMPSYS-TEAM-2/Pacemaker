@@ -1,5 +1,11 @@
 import csv
 
+AVI_VALUE = 300
+AEI_VALUE = 800
+PVARP_VALUE = 50
+VRP_VALUE = 150
+LRI_VALUE = 950
+URI_VALUE = 900
 
 def main():
     file = open('test-4.csv', 'r+')
@@ -9,7 +15,6 @@ def main():
     vtoa = 0
     atoa = 0
     vtov = 0
-    time = 0
 
     atovCounts = []
     vtoaCounts = []
@@ -21,7 +26,6 @@ def main():
     csvReader = csv.DictReader(file)
 
     for col in csvReader:
-        time += 1
         # Increment the timers
         atov += 1
         vtoa += 1
@@ -30,7 +34,7 @@ def main():
         # If there is an atrium event
         if (int((col[' A']).strip()) == 1 or int((col[' A']).strip()) == -1):
             # First two second can be ignored
-            if (float(col['Time']) > 1000):
+            if (float(col['Time']) > 2000):
                 vtoaCounts.append(vtoa)
                 atoaCounts.append(atoa)
             atov = 0
@@ -38,9 +42,10 @@ def main():
 
         if (int((col[' V']).strip()) == 1 or int((col[' V']).strip()) == -1):
             # First two second can be ignored
-            if (float(col['Time']) > 1000):
+            if (float(col['Time']) > 2000):
                 atovCounts.append(atov)
                 vtovCounts.append(vtov)
+                
             vtoa = 0
             vtov = 0
 

@@ -7,31 +7,31 @@ scchart Pacemaker {
   
     region Atrium {
       // Define clock variables
-      clock PVARP, AEI, VRP, LRI, AVI, URI
+      clock VentricleTimer, AtriumTimer
       
       initial state WaitAS
         // If a pulse is detected after the PVARP timer has expired
-        if (PVARP >= `PVARP_VALUE`) && AS go to setupVS
+        if (VentricleTimer >= `PVARP_VALUE`) && AS go to setupVS
 
         // If the AEI timer has expired and the AVI timer has expired generate an Atrium Pulse
-        if (AEI >= `AEI_VALUE`) do AP go to setupVS
+        if (VentricleTimer >= `AEI_VALUE`) do AP go to setupVS
       
       connector state setupVS
         // Reset Timers
-        immediate do AVI = 0 go to WaitVS
+        immediate do AtriumTimer = 0 go to WaitVS
         
       state WaitVS
         // If a pulse is detected after the VRP timer has expired 
-        if (VRP >= `VRP_VALUE`) && VS go to setupAS
+        if (VentricleTimer >= `VRP_VALUE`) && VS go to setupAS
         
         // If the URI timer has expired and the AVI timer has expired generate a Ventricle Pulse
-        if (URI >= `URI_VALUE`) && (AVI >= `AVI_VALUE`) do VP go to setupAS
+        if (VentricleTimer >= `URI_VALUE`) && (AtriumTimer >= `AVI_VALUE`) do VP go to setupAS
         
         // If the LRI timer has expited generate a Ventricle Pulse
-        if (LRI >= `LRI_VALUE`) do VP go to setupAS
+        if (VentricleTimer >= `LRI_VALUE`) do VP go to setupAS
       
         connector state setupAS
           // Reset Timers
-          immediate do PVARP = 0; VRP = 0; AEI = 0; LRI = 0; URI = 0 go to WaitAS
+          immediate do VentricleTimer = 0 go to WaitAS
     }
 }
