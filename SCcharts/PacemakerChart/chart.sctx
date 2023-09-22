@@ -1,6 +1,8 @@
 #resource "timing.h"
 #hostcode-c "#include \"timing.h\""
 
+@ClockUseSD
+
 scchart Pacemaker {
   input signal AS, VS
   output signal AP, VP
