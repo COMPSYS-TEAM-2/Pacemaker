@@ -1,3 +1,5 @@
 metadata
 .qsys_edit
 db
+output_files
+incremental_db
