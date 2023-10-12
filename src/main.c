@@ -41,11 +41,15 @@ int main()
 	tick(&data);
 
 	// Timer Init
-	alt_alarm ticker;
 	uint64_t systemTime = 0;
+	uint64_t prevTime = 0;
+	uint64_t aTime = -1;
+	uint64_t vTime = -1;
+
+	alt_alarm ticker;
 	void* timerContext = (void*) &systemTime;
 	alt_alarm_start(&ticker, 1, timerISR, timerContext);
-	uint64_t prevTime = 0;
+
 
 	// Reset LED
 	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x00);
@@ -59,14 +63,31 @@ int main()
 
 		  tick(&data);
 
-		  // update outputs
-		  if(data.AP){
-			  IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x01);
-		  } else if (data.VP){
-			  IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x02);
+		  // Set inputs
+		  if(key == 1) {
+			  data.AS = 1;
+		  } else if (key == 2){
+			  data.VS = 1;
 		  } else {
-			  IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x00);
+			  data.AS = 0;
+			  data.VS = 0;
 		  }
+
+		  // Set outputs
+		  if((data.AP) || (aTime < 50)){
+			  IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x01);
+			  aTime++;
+		  } else if ((data.VP) || (vTime < 50)){
+			  IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x02);
+			  vTime++;
+		  } else {
+			  IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x00);
+			  aTime = -1;
+			  vTime = -1;
+		  }
+
+		  // Reset key to 0
+		  key = 0;
 	  }
 	  return 0;
 }
