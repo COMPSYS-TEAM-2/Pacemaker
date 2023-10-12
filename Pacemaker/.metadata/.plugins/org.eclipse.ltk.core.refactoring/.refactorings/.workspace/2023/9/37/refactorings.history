@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;pacemaker-project/chart.h&apos;" deleteContents="false" description="Delete resource &apos;pacemaker-project/chart.h&apos;" element1="/pacemaker-project/chart.h" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1694407894299"/>&#x0A;<refactoring comment="Delete resource &apos;pacemaker-project/chart.c&apos;" deleteContents="false" description="Delete resource &apos;pacemaker-project/chart.c&apos;" element1="/pacemaker-project/chart.c" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1694407931350"/>
-</session>
