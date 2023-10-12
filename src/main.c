@@ -10,30 +10,26 @@
 #include <alt_types.h>
 
 #include "../inc/chart.h"
+#include "../inc/main.h"
 
+// ISR for pacemaker timing
 alt_u32 timerISR(void* context){
 	int* timeCount = (int*) context;
 	(*timeCount)++;
 	return 1; // next time out is 1ms
 }
 
-/*void keyISR(void* context, alt_u32 id){
-	int* temp = (void*) context;
-	(*temp) = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
-	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
-	printf("button: %i\n", *temp);
-}*/
 
 int main()
 {
+	// Pacemaker init
+	Pacemaker pacemaker_t;
+	pacemaker_t.state = chart;
 	printf("Pacemaker\n");
 
 	// Button init
 	int key = 0;
-	//void* keysContext = (void*) &key;
-	//IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
 	IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x7);
-	//alt_irq_register(KEYS_IRQ, keysContext, keyISR);
 
 	// SC Chart Init
 	TickData data;
@@ -61,8 +57,23 @@ int main()
 	    data.deltaT = systemTime - prevTime;
 	    prevTime = systemTime;
 
-	    // update inputs
-	    tick(&data);
+	    if (pacemaker_t.state != (IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & 0x3)){
+	    	pacemaker_t.state = (IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & 0x3);
+	    	printf("State %i\n", pacemaker_t.state);
+	    }
+
+
+	    // Update inputs
+	    switch (pacemaker_t.state & 0b1){
+	    case chart:
+	    	tick(&data);
+	    	break;
+	    case code:
+	    	break;
+	    default:
+			tick(&data);
+	    	break;
+	    }
 
 	    key = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
 		IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
@@ -101,10 +112,6 @@ int main()
 		    asTime = -1;
 		    vsTime = -1;
 	    }
-
-/*	    // Reset key to 0
-	    key = 0;
-*/
 	}
 	return 0;
 }
