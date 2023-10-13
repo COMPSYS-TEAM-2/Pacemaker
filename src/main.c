@@ -24,7 +24,8 @@ int main()
 {
 	// Pacemaker init
 	Pacemaker pacemaker_t;
-	pacemaker_t.state = CHART;
+	pacemaker_t.state = -1;
+	pacemaker_t.state = -1;
 	printf("Pacemaker\n");
 
 	// Button init
@@ -33,9 +34,6 @@ int main()
 
 	// Display init
 	FILE* fp;
-	fp = fopen(LCD_NAME,"w");
-	fprintf(fp, "Mode: SCChart\n\n");
-	fclose(fp);
 
 	// SC Chart Init
 	TickData data;
@@ -65,12 +63,16 @@ int main()
 
 	    if (pacemaker_t.state != (IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & 0x3)){
 	    	pacemaker_t.state = (IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & 0x3);
-	    	//fp = freopen(NULL ,"w", fp);
 	    	fp = fopen(LCD_NAME, "w");
-	    	if (pacemaker_t.state == CHART){
-	    		fprintf(fp, "Mode: SCChart\n\n");
-	    	} else if (pacemaker_t.state == CODE) {
-	    		fprintf(fp, "Mode: Code\n\n");
+	    	if ((pacemaker_t.state & 0x1) == CHART){
+	    		fprintf(fp, "Mode : SCChart\n");
+	    	} else {
+	    		fprintf(fp, "Mode : Code\n");
+	    	}
+	    	if ((pacemaker_t.state & 0x2) == BUTTONS) {
+	    		fprintf(fp, "Input: Buttons\n");
+	    	} else {
+	    		fprintf(fp, "Input: UART\n");
 	    	}
 	    	fclose(fp);
 	    	printf("State %i\n", pacemaker_t.state);
@@ -93,14 +95,16 @@ int main()
 	    key = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
 		IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
 
-	    // Set inputs
-	    if(key == 1) {
-	  	    data.AS = 1;
-	    } else if (key == 2){
-		    data.VS = 1;
-	    } else {
-		    data.AS = 0;
-		    data.VS = 0;
+		// Set inputs
+	    if ((pacemaker_t.state & 0x2) == BUTTONS) {
+			if(key == 1) {
+				data.AS = 1;
+			} else if (key == 2){
+				data.VS = 1;
+			} else {
+				data.AS = 0;
+				data.VS = 0;
+			}
 	    }
 
 	    // Set outputs
