@@ -1,8 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define chart	0
-#define code 	1
+#define CHART	0
+#define CODE 	1
 
 typedef struct {
 	int state;

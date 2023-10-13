@@ -24,12 +24,18 @@ int main()
 {
 	// Pacemaker init
 	Pacemaker pacemaker_t;
-	pacemaker_t.state = chart;
+	pacemaker_t.state = CHART;
 	printf("Pacemaker\n");
 
 	// Button init
 	int key = 0;
 	IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x7);
+
+	// Display init
+	FILE* fp;
+	fp = fopen(LCD_NAME,"w");
+	fprintf(fp, "Mode: SCChart\n\n");
+	fclose(fp);
 
 	// SC Chart Init
 	TickData data;
@@ -59,16 +65,25 @@ int main()
 
 	    if (pacemaker_t.state != (IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & 0x3)){
 	    	pacemaker_t.state = (IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & 0x3);
+	    	//fp = freopen(NULL ,"w", fp);
+	    	fp = fopen(LCD_NAME, "w");
+	    	if (pacemaker_t.state == CHART){
+	    		fprintf(fp, "Mode: SCChart\n\n");
+	    	} else if (pacemaker_t.state == CODE) {
+	    		fprintf(fp, "Mode: Code\n\n");
+	    	}
+	    	fclose(fp);
 	    	printf("State %i\n", pacemaker_t.state);
+
 	    }
 
 
 	    // Update inputs
 	    switch (pacemaker_t.state & 0b1){
-	    case chart:
+	    case CHART:
 	    	tick(&data);
 	    	break;
-	    case code:
+	    case CODE:
 	    	break;
 	    default:
 			tick(&data);
@@ -113,5 +128,6 @@ int main()
 		    vsTime = -1;
 	    }
 	}
+	fclose(fp);
 	return 0;
 }
