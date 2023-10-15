@@ -128,6 +128,13 @@ int main()
 				data.VS = 0;
 				data.AS = 0;
 			}
+
+	    	// UART Output
+	    	if (data.AP){
+	    		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BASE, 'A');
+	    	} else if (data.VP){
+	    		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BASE, 'V');
+	    	}
 	    }
 
 	    // Set outputs
