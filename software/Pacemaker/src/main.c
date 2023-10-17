@@ -22,6 +22,11 @@ alt_u32 timerISR(void* context){
 	return 1; // next time out is 1ms
 }
 
+void updateButtonInputs(uint8_t * AS, uint8_t * VS);
+void updateUartInputs(uint8_t * AS, uint8_t * VS);
+
+void updateUARTOutputs();
+void updateLEDOutputs();
 
 int main()
 {
@@ -54,14 +59,25 @@ int main()
 	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x00);
 
 	while(1){
-		// update time
+		// update Time
 	    data.deltaT = systemTime - prevTime;
 	    prevTime = systemTime;
 
-	    // Update state
+	    // Update State
 	    updateState(&state);
 
-	    // Update inputs
+	    // Update Inputs
+	    switch ((state >> INPUT) & 0b1)
+	    {
+	    case BUTTONS:
+	    	updateButtonInputs(&(data.AS), &(data.VS));
+	    	break;
+	    case UART:
+	    	updateUartInputs(&(data.AS), &(data.VS));
+	    	break;
+	    }
+
+	    // Update Pacemaker
 	    switch (state & 0b1){
 	    case CHART:
 	    	tick(&data);
@@ -73,39 +89,9 @@ int main()
 	    	break;
 	    }
 
-	    key = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
-		IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
 
-		// Set inputs
-	    if ((state & 0x2) == BUTTONS) {
-			if(key == 1) {
-				data.AS = 1;
-			} else if (key == 2){
-				data.VS = 1;
-			} else {
-				data.AS = 0;
-				data.VS = 0;
-			}
-	    } else { // UART
-	    	static char input = 0;
-	    	if (input != IORD_ALTERA_AVALON_UART_RXDATA(UART_BASE)){
-	    		input = IORD_ALTERA_AVALON_UART_RXDATA(UART_BASE);
-				if (input == 'V'){
-					data.VS = 1;
-					data.AS = 0;
-				} else if (input == 'A'){
-					data.AS = 1;
-					data.VS = 0;
-				} else {
-					data.VS = 0;
-					data.AS = 0;
-				}
-	    	} else {
-				data.VS = 0;
-				data.AS = 0;
-			}
-
-	    	// UART Output
+	    // UART Output
+	    if (((state >> INPUT) & 0b1) == UART) {
 	    	if (data.AP){
 	    		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BASE, 'A');
 	    	} else if (data.VP){
@@ -139,4 +125,42 @@ int main()
 	    }
 	}
 	return 0;
+}
+
+void updateButtonInputs(uint8_t * AS, uint8_t * VS)
+{
+	uint8_t key = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
+
+	// Set inputs
+	(*AS) = 0;
+	(*VS) = 0;
+	if(key == 1) {
+		*AS = 1;
+	} else if (key == 2){
+		*VS = 1;
+	}
+}
+
+void updateUartInputs(uint8_t * AS, uint8_t * VS)
+{
+	*VS = 0;
+	*AS = 0;
+	if (IORD_ALTERA_AVALON_UART_STATUS(UART_BASE)){
+		uint8_t input = IORD_ALTERA_AVALON_UART_RXDATA(UART_BASE);
+		if (input == 'V'){
+			*VS = 1;
+		} else if (input == 'A'){
+			*AS = 1;
+		}
+	}
+}
+
+void updateUARTOutputs()
+{
+}
+
+void updateLEDOutputs()
+{
+}
 }
