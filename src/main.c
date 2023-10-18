@@ -23,19 +23,13 @@ alt_u32 timerISR(void* context){
 	return 1; // next time out is 1ms
 }
 
-void updateButtonInputs(char * AS, char * VS);
-void updateUartInputs(char * AS, char * VS);
-
-void updateUARTOutputs(char AP, char VP);
-void updateLEDOutputs(char AP, char VP, char AS, char VS, double deltaT);
-
 int main()
 {
 	// Pacemaker init
 	uint8_t state = -1;
 
 	// Button init
-	IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x7);
+	IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0b11);
 
 	// SC Chart Init
 	TickData sData;
@@ -54,10 +48,6 @@ int main()
 	alt_alarm ticker;
 	void* timerContext = (void*) &systemTime;
 	alt_alarm_start(&ticker, 1, timerISR, timerContext);
-
-
-	// Reset LED
-	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x00);
 
 	while(1){
 		// update Time
@@ -78,9 +68,6 @@ int main()
 	    	break;
 	    case CODE:
 	    	c_tick(&cData);
-	    	break;
-	    default:
-			tick(&sData);
 	    	break;
 	    }
 

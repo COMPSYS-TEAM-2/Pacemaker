@@ -36,9 +36,10 @@ void updateButtonInputs(char * AS, char * VS)
 	// Set inputs
 	(*AS) = 0;
 	(*VS) = 0;
-	if(key == 1) {
+	if(key & 0b1) {
 		*AS = 1;
-	} else if (key == 2){
+	}
+	if (key & 0b10){
 		*VS = 1;
 	}
 }

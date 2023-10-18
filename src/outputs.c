@@ -43,7 +43,8 @@ void updateUARTOutputs(char AP, char VP)
 {
 	if (AP){
 		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BASE, 'A');
-	} else if (VP){
+	}
+	if (VP){
 		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BASE, 'V');
 	}
 }
