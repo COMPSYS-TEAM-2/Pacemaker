@@ -23,11 +23,11 @@ alt_u32 timerISR(void* context){
 	return 1; // next time out is 1ms
 }
 
-void updateButtonInputs(uint8_t * AS, uint8_t * VS);
-void updateUartInputs(uint8_t * AS, uint8_t * VS);
+void updateButtonInputs(char * AS, char * VS);
+void updateUartInputs(char * AS, char * VS);
 
-void updateUARTOutputs();
-void updateLEDOutputs();
+void updateUARTOutputs(char AP, char VP);
+void updateLEDOutputs(char AP, char VP, char AS, char VS);
 
 int main()
 {
@@ -35,7 +35,6 @@ int main()
 	uint8_t state = -1;
 
 	// Button init
-	int key = 0;
 	IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x7);
 
 	// SC Chart Init
@@ -51,10 +50,6 @@ int main()
 	// Timer Init
 	uint64_t systemTime = 0;
 	uint64_t prevTime = 0;
-	uint64_t apTime = -1;
-	uint64_t vpTime = -1;
-	uint64_t asTime = -1;
-	uint64_t vsTime = -1;
 
 	alt_alarm ticker;
 	void* timerContext = (void*) &systemTime;
@@ -87,7 +82,7 @@ int main()
 	    }
 
 	    // Update Pacemaker
-	    switch (state & 0b1){
+	    switch ((state >> MODE) & 0b1){
 	    case CHART:
 	    	tick(&sData);
 	    	break;
@@ -99,45 +94,34 @@ int main()
 	    	break;
 	    }
 
-
-	    // UART Output
+	    // UART output
 	    if (((state >> INPUT) & 0b1) == UART) {
-	    	if (sData.AP || cData.AP){
-	    		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BASE, 'A');
-	    	} else if (sData.VP || cData.VP){
-	    		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BASE, 'V');
-	    	}
+			switch ((state >> MODE) & 0b1){
+				case CHART:
+					updateUARTOutputs(sData.AP, sData.VP);
+					break;
+				case CODE:
+					updateUARTOutputs(cData.AP, cData.VP);
+					break;
+				// No default
+			}
 	    }
 
-	    // Set outputs
-	    if((sData.AP || cData.AP) || (apTime < 50)){
-		    IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x01);
-		    apTime++;
-	    } else if ((sData.VP || cData.VP) || (vpTime < 50)){
-		    IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x02);
-		    vpTime++;
-	    } else {
-		    IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x00);
-		    apTime = -1;
-		    vpTime = -1;
-	    }
-	    // Set outputs
-	    if((sData.AS || cData.AS) || (asTime < 50)){
-		    IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x01);
-		    asTime++;
-	    } else if ((sData.VS || cData.VS) || (vsTime < 50)){
-		    IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x02);
-		    vsTime++;
-	    } else {
-		    IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x00);
-		    asTime = -1;
-		    vsTime = -1;
-	    }
+	    // LED output
+		switch ((state >> MODE) & 0b1){
+			case CHART:
+				updateLEDOutputs(sData.AP, sData.VP, sData.AS, sData.VS);
+				break;
+			case CODE:
+				updateLEDOutputs(cData.AP, cData.VP, cData.AS, cData.VS);
+				break;
+			// No default
+		}
 	}
 	return 0;
 }
 
-void updateButtonInputs(uint8_t * AS, uint8_t * VS)
+void updateButtonInputs(char * AS, char * VS)
 {
 	uint8_t key = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
 	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
@@ -152,7 +136,7 @@ void updateButtonInputs(uint8_t * AS, uint8_t * VS)
 	}
 }
 
-void updateUartInputs(uint8_t * AS, uint8_t * VS)
+void updateUartInputs(char * AS, char * VS)
 {
 	static char input;
 	*VS = 0;
@@ -170,11 +154,32 @@ void updateUartInputs(uint8_t * AS, uint8_t * VS)
 	}
 }
 
-void updateUARTOutputs()
+void updateUARTOutputs(char AP, char VP)
 {
+	if (AP){
+		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BASE, 'A');
+	} else if (VP){
+		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BASE, 'V');
+	}
 }
 
-void updateLEDOutputs()
+void updateLEDOutputs(char AP, char VP, char AS, char VS)
 {
+	// Set outputs
+	if (AP){
+		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x01);
+	} else if (VP){
+		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x02);
+	} else {
+		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x00);
+	}
+	// Set outputs
+	if (AS){
+		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x01);
+	} else if (VS){
+		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x02);
+	} else {
+		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x00);
+	}
 }
 
