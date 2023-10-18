@@ -10,6 +10,8 @@
 #include <altera_avalon_uart.h>
 #include <altera_avalon_uart_regs.h>
 
+void updateButtonInputs(char * AS, char * VS);
+void updateUartInputs(char * AS, char * VS);
 
 void updateInputs(uint8_t state, TickData* sData, CData* cData){
 	switch (state) {
