@@ -17,11 +17,11 @@
 #include "../inc/outputs.h"
 
 // ISR for pacemaker timing
-alt_u32 timerISR(void* context){
+/*alt_u32 timerISR(void* context){
 	int* timeCount = (int*) context;
 	(*timeCount)++;
 	return 1; // next time out is 1ms
-}
+}*/
 
 int main()
 {
@@ -42,14 +42,16 @@ int main()
 	c_tick(&cData);
 
 	// Timer Init
-	uint64_t systemTime = 0;
+	//uint64_t systemTime = 0;
+	clock_t systemTime;
 	uint64_t prevTime = 0;
 
-	alt_alarm ticker;
-	void* timerContext = (void*) &systemTime;
-	alt_alarm_start(&ticker, 1, timerISR, timerContext);
+	//alt_alarm ticker;
+	//void* timerContext = (void*) &systemTime;
+	//alt_alarm_start(&ticker, 1, timerISR, timerContext);
 
 	while(1){
+		systemTime = clock();
 		// update Time
 	    sData.deltaT = systemTime - prevTime;
 	    cData.deltaT = systemTime - prevTime;
