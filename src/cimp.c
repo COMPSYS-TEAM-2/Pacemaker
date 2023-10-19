@@ -14,7 +14,9 @@ void c_tick(CData* d);
 void c_logic(CData* d){
 	d->AP = 0;
 	d->VP = 0;
-	if (state == ATRIUM) {
+	switch (state)
+	{
+	case ATRIUM:
 		// Transitions
 		if ((ventricleT >= PVARP_VALUE) && d->AS){
 			setupVS();
@@ -22,7 +24,8 @@ void c_logic(CData* d){
 			d->AP = 1;
 			setupVS();
 		}
-	} else if (state == VENTRICLE) {
+		break;
+	case VENTRICLE:
 		// Transitions
 		if ((ventricleT >= VRP_VALUE) && d->VS){
 			setupAS();
@@ -33,8 +36,7 @@ void c_logic(CData* d){
 			d->VP = 1;
 			setupAS();
 		}
-	} else {
-		state = ATRIUM;
+		break;
 	}
 }
 
