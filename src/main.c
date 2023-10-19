@@ -2,11 +2,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-
+#include <time.h>
 #include <system.h>
-#include <sys/alt_alarm.h>
-#include <sys/alt_irq.h>
-#include <alt_types.h>
 #include <altera_avalon_pio_regs.h>
 
 #include "../inc/chart.h"
@@ -15,13 +12,6 @@
 #include "../inc/defines.h"
 #include "../inc/inputs.h"
 #include "../inc/outputs.h"
-
-// ISR for pacemaker timing
-/*alt_u32 timerISR(void* context){
-	int* timeCount = (int*) context;
-	(*timeCount)++;
-	return 1; // next time out is 1ms
-}*/
 
 int main()
 {
@@ -42,16 +32,13 @@ int main()
 	c_tick(&cData);
 
 	// Timer Init
-	//uint64_t systemTime = 0;
 	clock_t systemTime;
 	uint64_t prevTime = 0;
 
-	//alt_alarm ticker;
-	//void* timerContext = (void*) &systemTime;
-	//alt_alarm_start(&ticker, 1, timerISR, timerContext);
-
 	while(1){
-		systemTime = clock();
+		// Get system time
+		systemTime = clock() * (1000 / CLOCKS_PER_SEC); // Works because CPS = 1000
+
 		// update Time
 	    sData.deltaT = systemTime - prevTime;
 	    cData.deltaT = systemTime - prevTime;

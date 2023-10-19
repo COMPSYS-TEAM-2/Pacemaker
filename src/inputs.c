@@ -5,10 +5,12 @@
  *      Author: fosu562
  */
 
-#include "../inc/inputs.h"
 #include <altera_avalon_pio_regs.h>
 #include <altera_avalon_uart.h>
 #include <altera_avalon_uart_regs.h>
+
+#include "../inc/defines.h"
+#include "../inc/inputs.h"
 
 void updateButtonInputs(char * AS, char * VS);
 void updateUartInputs(char * AS, char * VS);

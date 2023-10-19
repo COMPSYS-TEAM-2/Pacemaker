@@ -9,7 +9,6 @@
 #include "../inc/chart.h"
 
 
-
 void logic(TickData* d) {
   d->_g45 = d->_pg36;
   if (d->_g45) {

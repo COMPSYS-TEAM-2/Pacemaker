@@ -5,10 +5,12 @@
  *      Author: fosu562
  */
 
-#include "../inc/outputs.h"
 #include <altera_avalon_uart.h>
 #include <altera_avalon_uart_regs.h>
 #include <altera_avalon_pio_regs.h>
+
+#include "../inc/outputs.h"
+#include "../inc/defines.h"
 
 void updateUARTOutputs(char AP, char VP);
 void updateLEDOutputs(char AP, char VP, char AS, char VS, double deltaT);
