@@ -68,6 +68,33 @@ int main()
 	    // Update State
 	    updateState(&state);
 
+	    // Update Inputs
+		switch (state) {
+			case ((BUTTONS << INPUT) | (CHART << MODE)):
+				updateButtonInputs(&(sData.AS), &(sData.VS));
+				break;
+			case ((BUTTONS << INPUT) | (CODE << MODE)):
+				updateButtonInputs(&(cData.AS), &(cData.VS));
+				break;
+			case ((UART << INPUT) | (CHART << MODE)):
+				updateUartInputs(&(sData.AS), &(sData.VS));
+				break;
+			case ((UART << INPUT) | (CODE << MODE)):
+				updateUartInputs(&(cData.AS), &(cData.VS));
+				break;
+		}
+
+		// Button inputs
+		switch ((state >> MODE) & 0b1){
+			case CHART:
+				updateLEDOutputs(sData.AP, sData.VP, sData.AS, sData.VS, sData.deltaT);
+				break;
+			case CODE:
+				updateLEDOutputs(cData.AP, cData.VP, cData.AS, cData.VS, cData.deltaT);
+				break;
+			// No default
+		}
+
 	    // Update Pacemaker
 	    switch ((state >> MODE) & 0b1){
 	    case CHART:
@@ -80,19 +107,6 @@ int main()
 			tick(&sData);
 	    	break;
 	    }
-
-	    // Update Inputs
-		switch ((state >> INPUT) & 0b1)
-		{
-		case BUTTONS:
-			updateButtonInputs(&(sData.AS), &(sData.VS));
-			updateButtonInputs(&(cData.AS), &(cData.VS));
-			break;
-		case UART:
-			updateUartInputs(&(sData.AS), &(sData.VS));
-			updateUartInputs(&(cData.AS), &(cData.VS));
-			break;
-		}
 
 	    // UART output
 	    if (((state >> INPUT) & 0b1) == UART) {
@@ -165,30 +179,44 @@ void updateUARTOutputs(char AP, char VP)
 
 void updateLEDOutputs(char AP, char VP, char AS, char VS, double deltaT)
 {
-	static uint8_t apT, vpT, asT, vsT = -1;
+	static uint8_t apT, vpT, asT, vsT;
+	uint8_t ledG = 0;
+	uint8_t ledR = 0;
 	// Set outputs
-	if (AP || apT < 50){
-		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x01);
+	if (AP){
+		ledG |= 0b1;
+		apT = 0;
+	} else if (apT < LEDTIME) {
+		ledG |= 0b1;
 		apT = apT + deltaT;
-	} else if (VP || vpT < 50){
-		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x02);
+	}
+
+	if (VP){
+		ledG |= 0b10;
+		vpT = 0;
+	} else if (vpT < LEDTIME) {
+		ledG |= 0b10;
 		vpT = vpT + deltaT;
-	} else {
-		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x00);
-		apT = -1;
-		vpT = -1;
 	}
+
 	// Set outputs
-	if (AS || asT < 50){
-		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x01);
+	if (AS){
+		ledR |= 0b1;
+		asT = 0;
+	} else if (asT < LEDTIME) {
+		ledR |= 0b1;
 		asT = asT + deltaT;
-	} else if (VS || vsT < 50){
-		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x02);
-		vsT = vsT + deltaT;
-	} else {
-		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x00);
-		asT = -1;
-		vsT = -1;
 	}
+
+	if (VS){
+		ledR |= 0b10;
+		vsT = 0;
+	} else if (vsT < LEDTIME) {
+		ledR |= 0b10;
+		vsT = vsT + deltaT;
+	}
+
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, ledG);
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, ledR);
 }
 
