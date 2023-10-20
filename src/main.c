@@ -32,7 +32,7 @@ int main()
 	c_tick(&cData);
 
 	// Timer Init
-	clock_t systemTime;
+	uint64_t systemTime;
 	uint64_t prevTime = 0;
 
 	while(1){
