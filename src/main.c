@@ -60,13 +60,7 @@ int main()
 	    	break;
 	    }
 
-	    // UART output
-	    if (((state >> INPUT) & 0b1) == UART) {
-			uartOutputs(state, &sData, &cData);
-	    }
-
-	    // LED output
-	    ledOutputs(state, &sData, &cData);
+	    updateOutputs(state, &sData, &cData);
 	}
 	return 0;
 }

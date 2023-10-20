@@ -41,10 +41,10 @@ void updateButtonInputs(char * AS, char * VS)
 	(*AS) = 0;
 	(*VS) = 0;
 	if(key & 0b1) {
-		*AS = 1;
+		*VS = 1;
 	}
 	if (key & 0b10){
-		*VS = 1;
+		*AS = 1;
 	}
 }
 

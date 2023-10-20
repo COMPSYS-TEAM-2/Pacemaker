@@ -13,8 +13,7 @@
 #include "../inc/chart.h"
 #include "../inc/cimp.h"
 
-void uartOutputs(uint8_t state, TickData* sData, CData* cData);
-void ledOutputs(uint8_t state, TickData* sData, CData* cData);
+void updateOutputs(uint8_t state, TickData* sData, CData* cData);
 
 
 #endif /* OUTPUTS_H */

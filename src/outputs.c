@@ -15,6 +15,20 @@
 void updateUARTOutputs(char AP, char VP);
 void updateLEDOutputs(char AP, char VP, char AS, char VS, double deltaT);
 
+void uartOutputs(uint8_t state, TickData* sData, CData* cData);
+void ledOutputs(uint8_t state, TickData* sData, CData* cData);
+
+
+void updateOutputs(uint8_t state, TickData* sData, CData* cData){
+	// UART output
+	if (((state >> INPUT) & 0b1) == UART) {
+		uartOutputs(state, sData, cData);
+	}
+
+	// LED output
+	ledOutputs(state, sData, cData);
+}
+
 // UART output
 void uartOutputs(uint8_t state, TickData* sData, CData* cData){
 	switch ((state >> MODE) & 0b1){
@@ -58,35 +72,35 @@ void updateLEDOutputs(char AP, char VP, char AS, char VS, double deltaT)
 	uint8_t ledR = 0;
 	// Set outputs
 	if (AP){
-		ledG |= 0b1;
+		ledG |= 0b10;
 		apT = 0;
 	} else if (apT < LEDTIME) {
-		ledG |= 0b1;
+		ledG |= 0b10;
 		apT = apT + deltaT;
 	}
 
 	if (VP){
-		ledG |= 0b10;
+		ledG |= 0b1;
 		vpT = 0;
 	} else if (vpT < LEDTIME) {
-		ledG |= 0b10;
+		ledG |= 0b1;
 		vpT = vpT + deltaT;
 	}
 
 	// Set outputs
 	if (AS){
-		ledR |= 0b1;
+		ledR |= 0b10;
 		asT = 0;
 	} else if (asT < LEDTIME) {
-		ledR |= 0b1;
+		ledR |= 0b10;
 		asT = asT + deltaT;
 	}
 
 	if (VS){
-		ledR |= 0b10;
+		ledR |= 0b1;
 		vsT = 0;
 	} else if (vsT < LEDTIME) {
-		ledR |= 0b10;
+		ledR |= 0b1;
 		vsT = vsT + deltaT;
 	}
 
