@@ -1,0 +1,5 @@
+AV Autorythmic: Backup to SA, middle of heart. (60 bpm) Signals arrive at the same time (just above conduction)
+SA Autorythmic: Natural pacemaker (100bpm) Defines timing of heart
+AV Conduction: Conduction from atria to venticle (or vise versa)
+
+
